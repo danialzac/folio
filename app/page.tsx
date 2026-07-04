@@ -1,7 +1,8 @@
-import { findMinVol, findMaxSharpe, pct } from "@/lib/metrics"
+import { findMinVol, findMaxSharpe, pct, computeHealthScore } from "@/lib/metrics"
 import { RISK_FREE_RATE } from "@/types/portfolio"
 import MetricCard from "@/components/MetricCard"
 import HoldingsTable from "@/components/HoldingsTable"
+import PortfolioHealth from "@/components/PortfolioHealth"
 import capmData from "@/data/capm.json"
 
 // ENG: fallback stats if live fetch fails — keeps dashboard usable offline
@@ -84,7 +85,12 @@ export default async function DashboardPage() {
         <MetricCard label="Worst Performer" value={worstAsset.symbol} sub={pct(worstAsset.returns) + " return"} positive={false} />
       </div>
 
-      <HoldingsTable holdings={holdings} title="Optimal Holdings (Max Sharpe · CAPM)" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <HoldingsTable holdings={holdings} title="Optimal Holdings (Max Sharpe · CAPM)" />
+        </div>
+        <PortfolioHealth {...computeHealthScore(optimal.sharpe, optimal.point.returns, optimal.point.volatility, optimal.point.weights)} />
+      </div>
     </div>
   )
 }
